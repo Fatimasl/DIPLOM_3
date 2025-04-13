@@ -19,11 +19,15 @@ import static ru.iteco.fmhandroid.ui.Helper.attemptOfClickAllNews;
 //import static ru.iteco.fmhandroid.ui.Helper.chooseRandomDataForCreationNews;
 import static ru.iteco.fmhandroid.ui.Helper.idWaitToBeDisplayedAndThenMaybeClick;
 
+import static ru.iteco.fmhandroid.ui.Helper.isSortedAscending;
+import static ru.iteco.fmhandroid.ui.Helper.isSortedDesending;
 import static ru.iteco.fmhandroid.ui.Helper.objectOrIdCheckToBeDisplayedAndThenClick;
+import static ru.iteco.fmhandroid.ui.Helper.objectOrIdCheckToBeDisplayedAndThenReplaceText;
 import static ru.iteco.fmhandroid.ui.Helper.registeredLogin;
 import static ru.iteco.fmhandroid.ui.Helper.registeredPassword;
 import static ru.iteco.fmhandroid.ui.Helper.testIterateAllRecyclerItems;
 import static ru.iteco.fmhandroid.ui.Helper.testIterateRecyclerItemsByCondition;
+import static ru.iteco.fmhandroid.ui.Helper.testIterateRecyclerItemsBySort;
 
 import android.view.View;
 
@@ -50,8 +54,8 @@ public class AppActivityMainMenuTest {
     public ActivityScenarioRule<AppActivity> mActivityScenarioRule =
             new ActivityScenarioRule<>(AppActivity.class);
     private static View popupDecorView;
-    private String categoryForNewsToChoose;
-    private String descriptionForNewsToChoose;
+
+    private NewsData news;
 
     @Before
     public void setUp() {
@@ -72,14 +76,9 @@ public class AppActivityMainMenuTest {
     @Before
     public void chooseRandomDataEveryTime() {
         //заполняем рандомно категорию и описание для новой новости (события)
-        NewsData news = new NewsData(); // создаем контейнер
-
-        NewsData.chooseRandomDataForCreationNews(news);
-        categoryForNewsToChoose = news.category;
-        descriptionForNewsToChoose = news.description;
-
+        news = new NewsData();
+        NewsData.chooseRandomDataForCreationNews(news, 0);
     }
-
 
     @Test
     //2.1 Вызов из меню MAIN ссылки ALL NEWS
@@ -92,20 +91,10 @@ public class AppActivityMainMenuTest {
     public void addNewEventTest() {
         //Кликаем "все новости"
         attemptOfClickAllNews();
-        //Выбираем рандомно категорию для нового события (новости) и создаем уникальное ее описание
-//        String categoryForNewsToChoose = "";
-//        String descriptionForNewsToChoose = "";
-        //chooseRandomDataForCreationNews(categoryForNewsToChoose, descriptionForNewsToChoose);
-//        Random random = new Random();
-//        int randomIndex = random.nextInt(categoryValues.length); // Получаем случайный индекс
-//        String categoryForNewsToChoose = categoryValues[randomIndex]; // Выбираем значение по индексу
-//
-//        //создаем описание для новой новости
-//        String descriptionForNewsToChoose = RandomGenerator.generateRandomString();
-        //создаем новую новость с определенным описанием descriptionForNewsToChoose
-        attemptCreationNewEvent(popupDecorView, categoryForNewsToChoose, descriptionForNewsToChoose);
+        //создаем новую новость
+        attemptCreationNewEvent(news, true);
         //Проверяем, что новая новость создана с нужным описанием
-        boolean testResult = testIterateAllRecyclerItems(popupDecorView, R.id.news_list_recycler_view, descriptionForNewsToChoose, "Check availability"); //Проверяем наличие новости с определенным текстом
+        boolean testResult = testIterateAllRecyclerItems(popupDecorView, R.id.news_list_recycler_view, news.description, "Check availability"); //Проверяем наличие новости с определенным текстом
 
         if (testResult) {
             //завершаем тест с успехом
@@ -121,17 +110,14 @@ public class AppActivityMainMenuTest {
     public void deleteNewEventTest() {
         //Кликаем "все новости"
         attemptOfClickAllNews();
-
-        //создаем описание для новой новости
-        //String descriptionForNewsToChoose = RandomGenerator.generateRandomString();
-        //создаем новую новость с определенным описанием descriptionForNewsToChoose
-        attemptCreationNewEvent(popupDecorView, categoryForNewsToChoose, descriptionForNewsToChoose);
+        //создаем новую новость
+        attemptCreationNewEvent(news, true);
         //Проверяем, что новая новость создана с нужным описанием и сразу удаляем ее
-        boolean removeResult = testIterateAllRecyclerItems(popupDecorView, R.id.news_list_recycler_view, descriptionForNewsToChoose, "Remove event"); //Удаляем новость с определенным текстом
+        boolean removeResult = testIterateAllRecyclerItems(popupDecorView, R.id.news_list_recycler_view, news.description, "Remove event"); //Удаляем новость с определенным текстом
 
         if (removeResult) {
             //если удаление успешно, то проверяем, что новости с определенным текстом нет в списке
-            boolean testResult = testIterateAllRecyclerItems(popupDecorView, R.id.news_list_recycler_view, descriptionForNewsToChoose, "Check availability"); //Проверяем наличие новости с определенным текстом
+            boolean testResult = testIterateAllRecyclerItems(popupDecorView, R.id.news_list_recycler_view, news.description, "Check availability"); //Проверяем наличие новости с определенным текстом
             if (testResult) {//если новость присутствует, то заваливаем тест
                 assertTrue("This test passed intentionally", false);
             } else {
@@ -149,16 +135,14 @@ public class AppActivityMainMenuTest {
     public void cancelDeletionNewEventTest() {
         //Кликаем "все новости"
         attemptOfClickAllNews();
-        //создаем описание для новой новости
-        //String descriptionForNewsToChoose = RandomGenerator.generateRandomString();
-        //создаем новую новость с определенным описанием descriptionForNewsToChoose
-        attemptCreationNewEvent(popupDecorView, categoryForNewsToChoose, descriptionForNewsToChoose);
+        //создаем новую новость
+        attemptCreationNewEvent(news, true);
         //Проверяем, что новая новость создана с нужным описанием и сразу удаляем ее, но потом не подтверждаем удаления
-        boolean cancelRemoveResult = testIterateAllRecyclerItems(popupDecorView, R.id.news_list_recycler_view, descriptionForNewsToChoose, "Cancel removing event"); //Удаляем новость, но не подтверждаем этого действия
+        boolean cancelRemoveResult = testIterateAllRecyclerItems(popupDecorView, R.id.news_list_recycler_view, news.description, "Cancel removing event"); //Удаляем новость, но не подтверждаем этого действия
 
         if (cancelRemoveResult) {
             //если отмена удаления успешна, то проверяем, что новость с определенным текстом по-прежнему в списке
-            boolean testResult = testIterateAllRecyclerItems(popupDecorView, R.id.news_list_recycler_view, descriptionForNewsToChoose, "Check availability"); //Проверяем наличие новости с определенным текстом
+            boolean testResult = testIterateAllRecyclerItems(popupDecorView, R.id.news_list_recycler_view, news.description, "Check availability"); //Проверяем наличие новости с определенным текстом
             if (testResult) {
                 //завершаем тест с успехом
                 assertTrue("This test passed intentionally", true);
@@ -177,16 +161,14 @@ public class AppActivityMainMenuTest {
     public void deactiveNewEventTest() {
         //Кликаем "все новости"
         attemptOfClickAllNews();
-        //создаем описание для новой новости
-        //String descriptionForNewsToChoose = RandomGenerator.generateRandomString();
-        //создаем новую новость с определенным описанием descriptionForNewsToChoose
-        attemptCreationNewEvent(popupDecorView, categoryForNewsToChoose, descriptionForNewsToChoose);
+        //создаем новую новость
+        attemptCreationNewEvent(news, true);
         //Проверяем, что новая новость создана с нужным описанием и сразу деактивируем ее
-        boolean deactiveResult = testIterateAllRecyclerItems(popupDecorView, R.id.news_list_recycler_view, descriptionForNewsToChoose, "Deactive event"); //Деактивируем новость
+        boolean deactiveResult = testIterateAllRecyclerItems(popupDecorView, R.id.news_list_recycler_view, news.description, "Deactive event"); //Деактивируем новость
 
         if (deactiveResult) {
             //если деактивация успешна, то проверяем, что новость с определенным текстом по-прежнему в списке и деактивирована
-            boolean testResult = testIterateAllRecyclerItems(popupDecorView, R.id.news_list_recycler_view, descriptionForNewsToChoose, "Check availability and not active"); //Проверяем наличие деактивированной новости с определенным текстом
+            boolean testResult = testIterateAllRecyclerItems(popupDecorView, R.id.news_list_recycler_view, news.description, "Check availability and not active"); //Проверяем наличие деактивированной новости с определенным текстом
             if (testResult) {
                 //завершаем тест с успехом
                 assertTrue("This test passed intentionally", true);
@@ -205,36 +187,144 @@ public class AppActivityMainMenuTest {
     public void filterNewsByCategoryTest()  {
         //Кликаем "все новости"
         attemptOfClickAllNews();
-        //создаем описание для новой новости
-        //String descriptionForNewsToChoose = RandomGenerator.generateRandomString();
         //создаем новую новость с определенным описанием descriptionForNewsToChoose
-        attemptCreationNewEvent(popupDecorView, categoryForNewsToChoose, descriptionForNewsToChoose);
+        attemptCreationNewEvent(news, true);
 
         //Нажимаем кнопку "Фильтровать"
         idWaitToBeDisplayedAndThenMaybeClick(R.id.filter_news_material_button, true);
-//        //Нажимаем на выбор категории
-//        idWaitToBeDisplayedAndThenMaybeClick(R.id.news_item_category_text_auto_complete_text_view, true);
+        //Нажимаем на выбор категории
         ViewInteraction categoryChooseButton = onView(allOf(withId(R.id.text_input_end_icon), withParent(withParent(withParent(withParent(withId(R.id.news_item_category_text_input_layout)))))));
         objectOrIdCheckToBeDisplayedAndThenClick(categoryChooseButton, 0);
-//        //из выпавшего меню выбираем категорию созданной новости
-        onView(withText(categoryForNewsToChoose))
+        //из выпавшего меню выбираем категорию созданной новости
+        onView(withText(news.category))
                 .inRoot(withDecorView(Matchers.not(popupDecorView)))
                 .check(matches(isDisplayed()))
                 .perform(click());
-
-//        closeSoftKeyboard();
-//        hideKeyboard();
-
-        //ViewInteraction categoryView = onView(withId(R.id.news_item_category_text_auto_complete_text_view));
-        //objectCheckToBeDisplayedAndThenReplaceText(categoryView, categoryForNewsToChoose);
 
         //Нажимаем кнопку "FILTER"
         objectOrIdCheckToBeDisplayedAndThenClick(null, R.id.filter_button);
 
         //Проверяем, что все новости отфильтрованы по категории новой новости
-        testIterateRecyclerItemsByCondition(popupDecorView, R.id.news_list_recycler_view, categoryForNewsToChoose, "Filter category");
-
+        testIterateRecyclerItemsByCondition(R.id.news_list_recycler_view, news.category, "Filter category");
     }
 
+    @Test
+    //2.7 Вызов из меню NEWS страницы Control panel, добавление нового события (новости), отфильтровать события по дате и убедиться, что отфильтрованные события принадлежат выбранной дате
+    public void filterNewsByDateTest()  {
+        //Кликаем "все новости"
+        attemptOfClickAllNews();
+        //создаем новую новость
+        attemptCreationNewEvent(news, true);
+
+        //Нажимаем кнопку "Фильтровать"
+        idWaitToBeDisplayedAndThenMaybeClick(R.id.filter_news_material_button, true);
+
+        objectOrIdCheckToBeDisplayedAndThenReplaceText(null, R.id.news_item_publish_date_start_text_input_edit_text, news.date);
+        objectOrIdCheckToBeDisplayedAndThenReplaceText(null, R.id.news_item_publish_date_end_text_input_edit_text, news.date);
+
+        //Нажимаем кнопку "FILTER"
+        objectOrIdCheckToBeDisplayedAndThenClick(null, R.id.filter_button);
+
+        //Проверяем, что все новости отфильтрованы по дате новой новости
+        testIterateRecyclerItemsByCondition(R.id.news_list_recycler_view, news.date, "Filter date");
+    }
+
+    @Test
+    //2.8 Вызов из меню NEWS страницы Control panel, добавление нового события (новости), отфильтровать события по активным событиям и убедиться, что отфильтрованные события активны
+    public void filterNewsByActiveTest()  {
+        //Кликаем "все новости"
+        attemptOfClickAllNews();
+        //создаем новую новость
+        attemptCreationNewEvent(news, true);
+
+        //Нажимаем кнопку "Фильтровать"
+        idWaitToBeDisplayedAndThenMaybeClick(R.id.filter_news_material_button, true);
+
+        //сбрасываем чек-бокс "NOT ACTIVE"
+        objectOrIdCheckToBeDisplayedAndThenClick(null, R.id.filter_news_inactive_material_check_box);
+
+        //Нажимаем кнопку "FILTER"
+        objectOrIdCheckToBeDisplayedAndThenClick(null, R.id.filter_button);
+
+        //Проверяем, что все новости отфильтрованы только по активным
+        testIterateRecyclerItemsByCondition(R.id.news_list_recycler_view, "ACTIVE", "Filter active");
+    }
+
+    @Test
+    //2.9 Вызов из меню NEWS страницы Control panel, добавление нового события (новости), сделать его неактивным, отфильтровать события по неактивным событиям и убедиться, что отфильтрованные события не активны
+    public void filterNewsByNotActiveTest()  {
+        //Кликаем "все новости"
+        attemptOfClickAllNews();
+        //создаем новую новость
+        attemptCreationNewEvent(news, true);
+
+        //Проверяем, что новая новость создана с нужным описанием и сразу деактивируем ее
+        boolean deactiveResult = testIterateAllRecyclerItems(popupDecorView, R.id.news_list_recycler_view, news.description, "Deactive event"); //Деактивируем новость
+
+        if (deactiveResult) {
+            //Нажимаем кнопку "Фильтровать"
+            idWaitToBeDisplayedAndThenMaybeClick(R.id.filter_news_material_button, true);
+
+            //сбрасываем чек-бокс "NOT ACTIVE"
+            objectOrIdCheckToBeDisplayedAndThenClick(null, R.id.filter_news_active_material_check_box);
+
+            //Нажимаем кнопку "FILTER"
+            objectOrIdCheckToBeDisplayedAndThenClick(null, R.id.filter_button);
+
+            //Проверяем, что все новости отфильтрованы только по активным
+            testIterateRecyclerItemsByCondition(R.id.news_list_recycler_view, "NOT ACTIVE", "Filter active");
+        } else {
+            //если отмена удаления НЕ успешна, то заваливаем тест
+            assertTrue("This test is failed", false);
+        }
+    }
+
+    @Test
+    //2.10-2.11 Вызов из меню NEWS страницы Control panel, добавление трех новых событий (новостей) на сегодня, через месяц и через год, отсортировать события и убедиться, что события в списке идут по порядку
+    public void sortNewsTest()  {
+
+        //Кликаем "все новости"
+        attemptOfClickAllNews();
+        //создаем новую новость на сегодня
+        attemptCreationNewEvent(news, true);
+        //создаем новую новость в следующем месяце
+        NewsData news2 = new NewsData();
+        NewsData.chooseRandomDataForCreationNews(news2, 30);
+        attemptCreationNewEvent(news2, false);
+        //создаем новую новость в следующем году
+        NewsData news3 = new NewsData();
+        NewsData.chooseRandomDataForCreationNews(news3, 365);
+        attemptCreationNewEvent(news3, false);
+
+        //Нажимаем кнопку "Сортировать"
+        idWaitToBeDisplayedAndThenMaybeClick(R.id.sort_news_material_button, true);
+
+        //Проверяем, как расположены созданные новости (получаем массив номеров в отсортированном списке)
+        int[] numbers1 = testIterateRecyclerItemsBySort(R.id.news_list_recycler_view, news, news2, news3);
+
+        //Нажимаем кнопку "Сортировать" повторно
+        idWaitToBeDisplayedAndThenMaybeClick(R.id.sort_news_material_button, true);
+
+        //Проверяем, как расположены созданные новости (получаем массив номеров в отсортированном в обратном порядке списке)
+        int[] numbers2 = testIterateRecyclerItemsBySort(R.id.news_list_recycler_view, news, news2, news3);
+
+        if (isSortedAscending(numbers1)) {
+            if (isSortedDesending(numbers2)) {
+                //если в первом случае новости упорядочены по возрастанию, а во втором по убыванию, то успех
+                assertTrue("This test passed intentionally", true);
+            } else {
+                //если в первом случае новости упорядочены по возрастанию, и во втором по возрастанию, то заваливаем тест
+                assertTrue("This test is failed", false);
+            }
+        } else if (isSortedDesending(numbers1)) {
+            if (isSortedAscending(numbers2)) {
+                //если в первом случае новости упорядочены по убыванию, а во втором по возрастанию, то успех
+                assertTrue("This test passed intentionally", true);
+            } else {
+                //если в первом случае новости упорядочены по убыванию, и во втором по убыванию, то заваливаем тест
+                assertTrue("This test is failed", false);
+            }
+        }
+    }
 
 }

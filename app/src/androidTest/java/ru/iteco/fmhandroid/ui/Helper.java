@@ -209,26 +209,27 @@ public class Helper {
 //    }
 
     //Создает новое событие (новость) с определенным описанием
-    public static void attemptCreationNewEvent(View popupDecorView, String categoryForNewsToChoose, String descriptionForNewsToChoose) {
-
-        //убеждаемся, что на странице есть кнопка редактирования события и нажимаем на нее
-        idWaitToBeDisplayedAndThenMaybeClick(R.id.edit_news_material_button, true);
+    public static void attemptCreationNewEvent(NewsData news, boolean firstEvent) {
+        if (firstEvent) {
+            //убеждаемся, что на странице есть кнопка редактирования события и нажимаем на нее
+            idWaitToBeDisplayedAndThenMaybeClick(R.id.edit_news_material_button, true);
+        }
         //убеждаемся, что на странице есть кнопка добавления события и нажимаем на нее
         idWaitToBeDisplayedAndThenMaybeClick(R.id.add_news_image_view, true);
         //убеждаемся, что на странице есть текст Creating, но НЕ нажимаем на него
         idWaitToBeDisplayedAndThenMaybeClick(R.id.custom_app_bar_sub_title_text_view, false);
         //убеждаемся, что на странице есть поле Категория и вводим в него нужную категорию
-        objectOrIdCheckToBeDisplayedAndThenReplaceText(null, R.id.news_item_category_text_auto_complete_text_view, categoryForNewsToChoose);
-        objectOrIdCheckToBeDisplayedAndThenReplaceText(null, R.id.news_item_title_text_input_edit_text, categoryForNewsToChoose);
+        objectOrIdCheckToBeDisplayedAndThenReplaceText(null, R.id.news_item_category_text_auto_complete_text_view, news.category);
+        objectOrIdCheckToBeDisplayedAndThenReplaceText(null, R.id.news_item_title_text_input_edit_text, news.category);
 
-        //вводим дату публикации = текущая дата
-        objectOrIdCheckToBeDisplayedAndThenReplaceText(null, R.id.news_item_publish_date_text_input_edit_text, LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        //вводим дату публикации
+        objectOrIdCheckToBeDisplayedAndThenReplaceText(null, R.id.news_item_publish_date_text_input_edit_text, news.date);
 
-        //вводим время публикации = текущее время
-        objectOrIdCheckToBeDisplayedAndThenReplaceText(null, R.id.news_item_publish_time_text_input_edit_text, LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
+        //вводим время публикации
+        objectOrIdCheckToBeDisplayedAndThenReplaceText(null, R.id.news_item_publish_time_text_input_edit_text, news.time);
 
         //вводим описание публикации
-        objectOrIdCheckToBeDisplayedAndThenReplaceText(null, R.id.news_item_description_text_input_edit_text, descriptionForNewsToChoose);
+        objectOrIdCheckToBeDisplayedAndThenReplaceText(null, R.id.news_item_description_text_input_edit_text, news.description);
 
         //Нажимаем кнопку Сохранить
         idWaitToBeDisplayedAndThenMaybeClick(R.id.save_button, true);
@@ -360,7 +361,7 @@ public class Helper {
         return false;
     }
 
-    public static void testIterateRecyclerItemsByCondition(View popupDecorView, int recyclerId, String valueForCompair, String whatToDo) {
+    public static void testIterateRecyclerItemsByCondition(int recyclerId, String valueForCompair, String whatToDo) {
 
         int itemCount = getRecyclerViewItemCount(recyclerId);
 
@@ -377,9 +378,92 @@ public class Helper {
                 Espresso.onView(withRecyclerView(recyclerId)
                         .atPositionOnView(i, R.id.news_item_title_text_view))
                         .check(matches(withText(valueForCompair)));
+            } else if (whatToDo == "Filter date") { //проверяем фильтр по дате
+                Espresso.onView(withRecyclerView(recyclerId)
+                                .atPositionOnView(i, R.id.news_item_publication_date_text_view))
+                        .check(matches(withText(valueForCompair)));
+            } else if (whatToDo == "Filter active") { //проверяем фильтр по активности
+                Espresso.onView(withRecyclerView(recyclerId)
+                                .atPositionOnView(i, R.id.news_item_published_text_view))
+                        .check(matches(withText(valueForCompair)));
+            } else if (whatToDo == "Sort") { //проверяем сортировку по дате публикации
+                Espresso.onView(withRecyclerView(recyclerId)
+                                .atPositionOnView(i, R.id.news_item_publication_date_text_view))
+                        .check(matches(withText(valueForCompair)));
             }
         }
     }
 
+    public static int[] testIterateRecyclerItemsBySort(int recyclerId, NewsData news, NewsData news2, NewsData news3) {
+        // Создаём AtomicReference для хранения текста
+        AtomicReference<String> textReference = new AtomicReference<>();
 
+        int[] numbers = new int[3]; // создаём массив на 3 элемента для хранения номеров упорядоченных новостей
+
+        int itemCount = getRecyclerViewItemCount(recyclerId);
+
+        for (int i = 0; i < itemCount; i++) {
+            // Прокручиваем к нужной позиции
+            Espresso.onView(ViewMatchers.withId(recyclerId))
+                    .perform(RecyclerViewActions.scrollToPosition(i));
+
+            // Проверяем отображение элемента
+            Espresso.onView(withRecyclerView(recyclerId).atPosition(i))
+                    .check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+            try {
+                // проверка видимости текста описания новости
+                onView(withRecyclerView(recyclerId)
+                        .atPositionOnView(i, R.id.news_item_description_text_view))
+                        .check(matches(isDisplayed()));
+            } catch (AssertionError e) {
+                // Кликаем на кнопку открытия описания новости
+                Espresso.onView(withRecyclerView(recyclerId)
+                                .atPositionOnView(i, R.id.view_news_item_image_view))
+                        .perform(click());
+            }
+
+            // Докручиваем к нужной позиции, чтобы она отображалась полностью, вместе с текстом новости
+            Espresso.onView(ViewMatchers.withId(recyclerId))
+                    .perform(RecyclerViewActions.scrollToPosition(i));
+
+            // проверка текста описания новости
+            onView(withRecyclerView(recyclerId)
+                    .atPositionOnView(i, R.id.news_item_description_text_view))
+                    .perform(new GetTextFromMaterialTextViewAction(textReference)); // Тут мы получаем текст из i-ой новости
+
+            // Извлекаем текст из AtomicReference
+            String extractedText = textReference.get();
+
+            if (news.description.equals(extractedText)) {
+                //если нашли новость с текстом новости на сегодня, то
+                numbers[0] = i;
+            } else if (news2.description.equals(extractedText)) {
+                //если нашли новость с текстом новости через месяц, то
+                numbers[1] = i;
+            } else if (news3.description.equals(extractedText)) {
+                //если нашли новость с текстом новости через месяц, то
+                numbers[2] = i;
+            }
+        }
+        return numbers;
+    }
+    //проверяет, что массив значений упорядочен по возрастанию
+    public static boolean isSortedAscending(int[] array) {
+        for (int i = 0; i < array.length - 1; i++) {
+            if (array[i] > array[i + 1]) {
+                return false; // если текущее число больше следующего — массив не отсортирован
+            }
+        }
+        return true; // если не найдено нарушений — массив отсортирован
+    }
+    //проверяет, что массив значений упорядочен по убыванию
+    public static boolean isSortedDesending(int[] array) {
+        for (int i = 0; i < array.length - 1; i++) {
+            if (array[i] < array[i + 1]) {
+                return false; // если текущее число больше следующего — массив не отсортирован
+            }
+        }
+        return true; // если не найдено нарушений — массив отсортирован
+    }
 }
