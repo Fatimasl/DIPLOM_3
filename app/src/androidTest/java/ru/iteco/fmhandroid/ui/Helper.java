@@ -15,6 +15,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withParent;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertTrue;
 
 //import static ru.iteco.fmhandroid.ui.AppActivityMainMenuTest.popupDecorView;
@@ -66,11 +67,13 @@ public class Helper {
     static String hintOf_password_text_input_layout = "Password";
     static String descriptionOf_authorization_image_button = "Authorization";
     static String textOf_title = "Log out";
-    static String all_news_text_view = "all_news_text_view";
+    static int wiseAmount = 8;
     static String textButtonOK = "OK";
     static String textButtonCANCEL = "CANCEL";
     static String textOfSwitcherActive = "Active";
     static String textOfSwitcherNotActive = "Not active";
+    public static String OurWiseTitle = "";
+    public static String ourWiseDescription = "";
 
     /**
      * Perform action of waiting for a specific view id to be displayed.
@@ -269,6 +272,14 @@ public class Helper {
     public static boolean testIterateAllRecyclerItems(View popupDecorView, int recyclerId, String descriptionForNewsToChoose, String whatToDo) {
         // Создаём AtomicReference для хранения текста
         AtomicReference<String> textReference = new AtomicReference<>();
+        //id элементов по умолчанию (для перечня новостей)
+        int idDescription = R.id.news_item_description_text_view;
+        int idItemImage = R.id.view_news_item_image_view;
+
+        if (recyclerId == R.id.our_mission_item_list_recycler_view) {
+            idDescription = R.id.our_mission_item_title_text_view;//;
+            idItemImage = R.id.our_mission_item_open_card_image_button;
+        }
 
         int itemCount = getRecyclerViewItemCount(recyclerId);
 
@@ -283,12 +294,12 @@ public class Helper {
             try {
                 // проверка видимости текста описания новости
                 onView(withRecyclerView(recyclerId)
-                        .atPositionOnView(i, R.id.news_item_description_text_view))
+                        .atPositionOnView(i, idDescription))
                         .check(matches(isDisplayed()));
             } catch (AssertionError e) {
                 // Кликаем на кнопку открытия описания новости
                 Espresso.onView(withRecyclerView(recyclerId)
-                                .atPositionOnView(i, R.id.view_news_item_image_view))
+                                .atPositionOnView(i, idItemImage))
                         .perform(click());
             }
 
@@ -298,7 +309,7 @@ public class Helper {
 
             // проверка текста описания новости
             onView(withRecyclerView(recyclerId)
-                    .atPositionOnView(i, R.id.news_item_description_text_view))
+                    .atPositionOnView(i, idDescription))
                     .perform(new GetTextFromMaterialTextViewAction(textReference)); // Тут мы получаем текст из i-ой новости
 
             // Извлекаем текст из AtomicReference
@@ -352,6 +363,14 @@ public class Helper {
                     Espresso.onView(withRecyclerView(recyclerId)
                                     .atPositionOnView(i, R.id.news_item_published_text_view))
                             .check(matches(withText(textOfSwitcherNotActive)));
+
+                    return true;
+
+                } else if (whatToDo == "Check wise") {//Проверяем соответствие описания заголовку
+                    // Проверяем, что мудрость имеет определенное описание
+                    Espresso.onView(withRecyclerView(recyclerId)
+                                    .atPositionOnView(i, R.id.our_mission_item_description_text_view))
+                            .check(matches(withText(containsString(Helper.ourWiseDescription))));
 
                     return true;
                 }

@@ -3,6 +3,10 @@ package ru.iteco.fmhandroid.ui;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.intent.Intents.intended;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasData;
+import static androidx.test.espresso.intent.matcher.UriMatchers.hasHost;
 import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -14,9 +18,6 @@ import static ru.iteco.fmhandroid.ui.Helper.attemptCreationNewEvent;
 
 import static ru.iteco.fmhandroid.ui.Helper.attemptOfAuthorization;
 import static ru.iteco.fmhandroid.ui.Helper.attemptOfClickAllNews;
-//import static ru.iteco.fmhandroid.ui.Helper.categoryForNewsToChoose;
-//import static ru.iteco.fmhandroid.ui.Helper.categoryValues;
-//import static ru.iteco.fmhandroid.ui.Helper.chooseRandomDataForCreationNews;
 import static ru.iteco.fmhandroid.ui.Helper.idWaitToBeDisplayedAndThenMaybeClick;
 
 import static ru.iteco.fmhandroid.ui.Helper.isSortedAscending;
@@ -29,10 +30,13 @@ import static ru.iteco.fmhandroid.ui.Helper.testIterateAllRecyclerItems;
 import static ru.iteco.fmhandroid.ui.Helper.testIterateRecyclerItemsByCondition;
 import static ru.iteco.fmhandroid.ui.Helper.testIterateRecyclerItemsBySort;
 
+import android.content.Intent;
 import android.view.View;
 
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.espresso.Espresso;
 import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
@@ -42,8 +46,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.Random;
 
 import ru.iteco.fmhandroid.R;
 
@@ -327,4 +329,65 @@ public class AppActivityMainMenuTest {
         }
     }
 
+    @Test
+    //2.12 Вызов из меню About первой ссылки
+    public void firstAboutLinkTest() throws InterruptedException {
+        //ждем, пока на странице появится ссылка "All news" и не нажимаем на нее
+        idWaitToBeDisplayedAndThenMaybeClick(R.id.all_news_text_view, false);
+
+        //Жмем на кнопку МЕНЮ
+        idWaitToBeDisplayedAndThenMaybeClick(R.id.main_menu_image_button, true);
+
+        //Из всплывающего меню жмем раздел ABOUT
+        onView(withText("About"))
+                .inRoot(withDecorView(Matchers.not(popupDecorView)))
+                .check(matches(isDisplayed()))
+                .perform(click());
+
+        //Дожидаемся, когда будет доступна первая ссылка, но не кликаем ее
+        idWaitToBeDisplayedAndThenMaybeClick(R.id.about_privacy_policy_value_text_view, false);
+        //включаем прослушку intents
+        Intents.init();
+        //кликаем на ссылку
+        Espresso.onView(withId(R.id.about_privacy_policy_value_text_view))
+                        .perform(click());
+        //проверяем, что было вызвано приложение для открытия ссылки нужного сайта
+        intended(allOf(
+                hasAction(Intent.ACTION_VIEW),
+                hasData(hasHost("vhospice.org"))
+        ));
+        //выключаем прослушку intents
+        Intents.release();
+    }
+
+    @Test
+    //2.13 Вызов из меню About второй ссылки
+    public void secondAboutLinkTest() throws InterruptedException {
+        //ждем, пока на странице появится ссылка "All news" и не нажимаем на нее
+        idWaitToBeDisplayedAndThenMaybeClick(R.id.all_news_text_view, false);
+
+        //Жмем на кнопку МЕНЮ
+        idWaitToBeDisplayedAndThenMaybeClick(R.id.main_menu_image_button, true);
+
+        //Из всплывающего меню жмем раздел ABOUT
+        onView(withText("About"))
+                .inRoot(withDecorView(Matchers.not(popupDecorView)))
+                .check(matches(isDisplayed()))
+                .perform(click());
+
+        //Дожидаемся, когда будет доступна первая ссылка, но не кликаем ее
+        idWaitToBeDisplayedAndThenMaybeClick(R.id.about_terms_of_use_value_text_view, false);
+        //включаем прослушку intents
+        Intents.init();
+        //кликаем на ссылку
+        Espresso.onView(withId(R.id.about_terms_of_use_value_text_view))
+                .perform(click());
+        //проверяем, что было вызвано приложение для открытия ссылки нужного сайта
+        intended(allOf(
+                hasAction(Intent.ACTION_VIEW),
+                hasData(hasHost("vhospice.org"))
+        ));
+        //выключаем прослушку intents
+        Intents.release();
+    }
 }
