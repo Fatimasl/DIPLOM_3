@@ -232,7 +232,7 @@ class SplashScreenFragment : Fragment(R.layout.fragment_splash_screen) {
         }
 
         lifecycleScope.launch {
-            delay(3_000)
+            delay(1_000)
             authViewModel.authorization()
         }
     }
