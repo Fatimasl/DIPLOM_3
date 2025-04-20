@@ -28,6 +28,7 @@ import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.Espresso;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.rule.ActivityTestRule;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -40,19 +41,24 @@ import ru.iteco.fmhandroid.R;
 
 public class AppActivityWiseMenuTest {
 
+//    @Rule
+//    public ActivityScenarioRule<AppActivity> mActivityScenarioRule =
+//            new ActivityScenarioRule<>(AppActivity.class);
     @Rule
-    public ActivityScenarioRule<AppActivity> mActivityScenarioRule =
-            new ActivityScenarioRule<>(AppActivity.class);
+    public ActivityTestRule<AppActivity> mActivityRule =
+            new ActivityTestRule<>(AppActivity.class);
     private static View popupDecorView;
 
     @Before
     public void setUp() {
-        mActivityScenarioRule.getScenario().onActivity(new ActivityScenario.ActivityAction<AppActivity>() {
-            @Override
-            public void perform(AppActivity activity) {
-                popupDecorView = activity.getWindow().getDecorView();
-            }
-        });
+//        mActivityScenarioRule.getScenario().onActivity(new ActivityScenario.ActivityAction<AppActivity>() {
+//            @Override
+//            public void perform(AppActivity activity) {
+//                popupDecorView = activity.getWindow().getDecorView();
+//            }
+//        });
+        AppActivity activity = mActivityRule.getActivity();
+        popupDecorView = activity.getWindow().getDecorView();
     }
 
     @Before

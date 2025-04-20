@@ -34,12 +34,15 @@ import static ru.iteco.fmhandroid.ui.Helper.waitingPeriod;
 import android.view.View;
 
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.espresso.IdlingRegistry;
+import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
 
+import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
@@ -53,22 +56,25 @@ import ru.iteco.fmhandroid.R;
 
 public class AppActivityAuthorizationTest {
 
-    @Rule
-    public ActivityScenarioRule<AppActivity> mActivityScenarioRule =
-            new ActivityScenarioRule<>(AppActivity.class);
 //    @Rule
-//    public ActivityTestRule<AppActivity> activityRule =
-//            new ActivityTestRule<>(AppActivity.class);
-    private static View decorView;
+//    public ActivityScenarioRule<AppActivity> mActivityScenarioRule =
+//            new ActivityScenarioRule<>(AppActivity.class);
+    @Rule
+    public ActivityTestRule<AppActivity> mActivityRule =
+            new ActivityTestRule<>(AppActivity.class);
+    private static View popupDecorView;
 
     @Before
-    public void setUp() {
-        mActivityScenarioRule.getScenario().onActivity(new ActivityScenario.ActivityAction<AppActivity>() {
-            @Override
-            public void perform(AppActivity activity) {
-                decorView = activity.getWindow().getDecorView();
-            }
-        });
+    public void setUp() throws InterruptedException {
+//        mActivityScenarioRule.getScenario().onActivity(new ActivityScenario.ActivityAction<AppActivity>() {
+//            @Override
+//            public void perform(AppActivity activity) {
+//                decorView = activity.getWindow().getDecorView();
+//            }
+//        });
+        Thread.sleep(1_800);
+        AppActivity activity = mActivityRule.getActivity();
+        popupDecorView = activity.getWindow().getDecorView();
     }
 
     @Test
@@ -146,25 +152,7 @@ public class AppActivityAuthorizationTest {
     public static void assertionOfToast(int textOfToast) {
         //Убедимся, что видно сообщение c определенным текстом об ошибке в Toast
         onView(withText(textOfToast))
-                .inRoot(withDecorView(Matchers.not(decorView)))
+                .inRoot(withDecorView(Matchers.not(popupDecorView)))
                 .check(matches(isDisplayed()));
     }
-//    private static Matcher<View> childAtPosition(
-//            final Matcher<View> parentMatcher, final int position) {
-//
-//        return new TypeSafeMatcher<View>() {
-//            @Override
-//            public void describeTo(Description description) {
-//                description.appendText("Child at position " + position + " in parent ");
-//                parentMatcher.describeTo(description);
-//            }
-//
-//            @Override
-//            public boolean matchesSafely(View view) {
-//                ViewParent parent = view.getParent();
-//                return parent instanceof ViewGroup && parentMatcher.matches(parent)
-//                        && view.equals(((ViewGroup) parent).getChildAt(position));
-//            }
-//        };
-//    }
 }

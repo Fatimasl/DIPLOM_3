@@ -40,6 +40,7 @@ import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+import androidx.test.rule.ActivityTestRule;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -52,21 +53,26 @@ import ru.iteco.fmhandroid.R;
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class AppActivityMainMenuTest {
+//    @Rule
+//    public ActivityScenarioRule<AppActivity> mActivityScenarioRule =
+//            new ActivityScenarioRule<>(AppActivity.class);
     @Rule
-    public ActivityScenarioRule<AppActivity> mActivityScenarioRule =
-            new ActivityScenarioRule<>(AppActivity.class);
+    public ActivityTestRule<AppActivity> mActivityRule =
+            new ActivityTestRule<>(AppActivity.class);
     private static View popupDecorView;
 
     private NewsData news;
 
     @Before
     public void setUp() {
-        mActivityScenarioRule.getScenario().onActivity(new ActivityScenario.ActivityAction<AppActivity>() {
-            @Override
-            public void perform(AppActivity activity) {
-                popupDecorView = activity.getWindow().getDecorView();
-            }
-        });
+//        mActivityScenarioRule.getScenario().onActivity(new ActivityScenario.ActivityAction<AppActivity>() {
+//            @Override
+//            public void perform(AppActivity activity) {
+//                popupDecorView = activity.getWindow().getDecorView();
+//            }
+//        });
+        AppActivity activity = mActivityRule.getActivity();
+        popupDecorView = activity.getWindow().getDecorView();
     }
 
     @Before
