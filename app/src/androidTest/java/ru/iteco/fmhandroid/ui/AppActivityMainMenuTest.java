@@ -15,11 +15,9 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.junit.Assert.assertTrue;
 import static ru.iteco.fmhandroid.ui.Helper.attemptCreationNewEvent;
-
 import static ru.iteco.fmhandroid.ui.Helper.attemptOfAuthorization;
 import static ru.iteco.fmhandroid.ui.Helper.attemptOfClickAllNews;
 import static ru.iteco.fmhandroid.ui.Helper.idWaitToBeDisplayedAndThenMaybeClick;
-
 import static ru.iteco.fmhandroid.ui.Helper.isSortedAscending;
 import static ru.iteco.fmhandroid.ui.Helper.isSortedDesending;
 import static ru.iteco.fmhandroid.ui.Helper.objectOrIdCheckToBeDisplayedAndThenClick;
@@ -33,12 +31,9 @@ import static ru.iteco.fmhandroid.ui.Helper.testIterateRecyclerItemsBySort;
 import android.content.Intent;
 import android.view.View;
 
-import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.Espresso;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.intent.Intents;
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
 
@@ -48,14 +43,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import io.qameta.allure.android.runners.AllureAndroidJUnit4;
+import io.qameta.allure.kotlin.Description;
+import io.qameta.allure.kotlin.Severity;
+import io.qameta.allure.kotlin.SeverityLevel;
 import ru.iteco.fmhandroid.R;
 
 @LargeTest
-@RunWith(AndroidJUnit4.class)
+@RunWith(AllureAndroidJUnit4.class)
 public class AppActivityMainMenuTest {
-//    @Rule
-//    public ActivityScenarioRule<AppActivity> mActivityScenarioRule =
-//            new ActivityScenarioRule<>(AppActivity.class);
+
     @Rule
     public ActivityTestRule<AppActivity> mActivityRule =
             new ActivityTestRule<>(AppActivity.class);
@@ -65,12 +62,7 @@ public class AppActivityMainMenuTest {
 
     @Before
     public void setUp() {
-//        mActivityScenarioRule.getScenario().onActivity(new ActivityScenario.ActivityAction<AppActivity>() {
-//            @Override
-//            public void perform(AppActivity activity) {
-//                popupDecorView = activity.getWindow().getDecorView();
-//            }
-//        });
+
         AppActivity activity = mActivityRule.getActivity();
         popupDecorView = activity.getWindow().getDecorView();
     }
@@ -88,14 +80,16 @@ public class AppActivityMainMenuTest {
         NewsData.chooseRandomDataForCreationNews(news, 0);
     }
 
+    @Severity(SeverityLevel.CRITICAL)
     @Test
-    //2.1 Вызов из меню MAIN ссылки ALL NEWS
+    @Description("2.1 Вызов из меню MAIN ссылки ALL NEWS")
     public void callAllNewsTest() {
         attemptOfClickAllNews();
     }
 
+    @Severity(SeverityLevel.BLOCKER)
     @Test
-    //2.2 Вызов из меню NEWS страницы Control panel и добавление нового события (новости)
+    @Description("2.2 Вызов из меню NEWS страницы Control panel и добавление нового события (новости)")
     public void addNewEventTest() {
         //Кликаем "все новости"
         attemptOfClickAllNews();
@@ -113,8 +107,9 @@ public class AppActivityMainMenuTest {
         }
     }
 
+    @Severity(SeverityLevel.BLOCKER)
     @Test
-    //2.3 Вызов из меню NEWS страницы Control panel, добавление нового события (новости) и удаление его
+    @Description("2.3 Вызов из меню NEWS страницы Control panel, добавление нового события (новости) и удаление его")
     public void deleteNewEventTest() {
         //Кликаем "все новости"
         attemptOfClickAllNews();
@@ -138,8 +133,9 @@ public class AppActivityMainMenuTest {
         }
     }
 
+    @Severity(SeverityLevel.CRITICAL)
     @Test
-    //2.4 Вызов из меню NEWS страницы Control panel, добавление нового события (новости), вызов удаления этого события и отмена удаления
+    @Description("2.4 Вызов из меню NEWS страницы Control panel, добавление нового события (новости), вызов удаления этого события и отмена удаления")
     public void cancelDeletionNewEventTest() {
         //Кликаем "все новости"
         attemptOfClickAllNews();
@@ -164,8 +160,9 @@ public class AppActivityMainMenuTest {
         }
     }
 
+    @Severity(SeverityLevel.NORMAL)
     @Test
-    //2.5 Вызов из меню NEWS страницы Control panel, добавление нового события (новости), вызов редактирования этого события и перевод события в неактивный режим
+    @Description("2.5 Вызов из меню NEWS страницы Control panel, добавление нового события (новости), вызов редактирования этого события и перевод события в неактивный режим")
     public void deactiveNewEventTest() {
         //Кликаем "все новости"
         attemptOfClickAllNews();
@@ -190,8 +187,9 @@ public class AppActivityMainMenuTest {
         }
     }
 
+    @Severity(SeverityLevel.NORMAL)
     @Test
-    //2.6 Вызов из меню NEWS страницы Control panel, добавление нового события (новости), отфильтровать события по категории и убедиться, что отфильтрованные события принадлежат выбранной категории
+    @Description("2.6 Вызов из меню NEWS страницы Control panel, добавление нового события (новости), отфильтровать события по категории и убедиться, что отфильтрованные события принадлежат выбранной категории")
     public void filterNewsByCategoryTest()  {
         //Кликаем "все новости"
         attemptOfClickAllNews();
@@ -216,8 +214,9 @@ public class AppActivityMainMenuTest {
         testIterateRecyclerItemsByCondition(R.id.news_list_recycler_view, news.category, "Filter category");
     }
 
+    @Severity(SeverityLevel.NORMAL)
     @Test
-    //2.7 Вызов из меню NEWS страницы Control panel, добавление нового события (новости), отфильтровать события по дате и убедиться, что отфильтрованные события принадлежат выбранной дате
+    @Description("2.7 Вызов из меню NEWS страницы Control panel, добавление нового события (новости), отфильтровать события по дате и убедиться, что отфильтрованные события принадлежат выбранной дате")
     public void filterNewsByDateTest()  {
         //Кликаем "все новости"
         attemptOfClickAllNews();
@@ -237,8 +236,9 @@ public class AppActivityMainMenuTest {
         testIterateRecyclerItemsByCondition(R.id.news_list_recycler_view, news.date, "Filter date");
     }
 
+    @Severity(SeverityLevel.NORMAL)
     @Test
-    //2.8 Вызов из меню NEWS страницы Control panel, добавление нового события (новости), отфильтровать события по активным событиям и убедиться, что отфильтрованные события активны
+    @Description("2.8 Вызов из меню NEWS страницы Control panel, добавление нового события (новости), отфильтровать события по активным событиям и убедиться, что отфильтрованные события активны")
     public void filterNewsByActiveTest()  {
         //Кликаем "все новости"
         attemptOfClickAllNews();
@@ -258,8 +258,9 @@ public class AppActivityMainMenuTest {
         testIterateRecyclerItemsByCondition(R.id.news_list_recycler_view, "ACTIVE", "Filter active");
     }
 
+    @Severity(SeverityLevel.MINOR)
     @Test
-    //2.9 Вызов из меню NEWS страницы Control panel, добавление нового события (новости), сделать его неактивным, отфильтровать события по неактивным событиям и убедиться, что отфильтрованные события не активны
+    @Description("2.9 Вызов из меню NEWS страницы Control panel, добавление нового события (новости), сделать его неактивным, отфильтровать события по неактивным событиям и убедиться, что отфильтрованные события не активны")
     public void filterNewsByNotActiveTest()  {
         //Кликаем "все новости"
         attemptOfClickAllNews();
@@ -287,8 +288,9 @@ public class AppActivityMainMenuTest {
         }
     }
 
+    @Severity(SeverityLevel.NORMAL)
     @Test
-    //2.10-2.11 Вызов из меню NEWS страницы Control panel, добавление трех новых событий (новостей) на сегодня, через месяц и через год, отсортировать события и убедиться, что события в списке идут по порядку
+    @Description("2.10-2.11 Вызов из меню NEWS страницы Control panel, добавление трех новых событий (новостей) на сегодня, через месяц и через год, отсортировать события и убедиться, что события в списке идут по порядку")
     public void sortNewsTest()  {
 
         //Кликаем "все новости"
@@ -335,8 +337,9 @@ public class AppActivityMainMenuTest {
         }
     }
 
+    @Severity(SeverityLevel.TRIVIAL)
     @Test
-    //2.12 Вызов из меню About первой ссылки
+    @Description("2.12 Вызов из меню About первой ссылки")
     public void firstAboutLinkTest() throws InterruptedException {
         //ждем, пока на странице появится ссылка "All news" и не нажимаем на нее
         idWaitToBeDisplayedAndThenMaybeClick(R.id.all_news_text_view, false);
@@ -365,9 +368,9 @@ public class AppActivityMainMenuTest {
         //выключаем прослушку intents
         Intents.release();
     }
-
+    @Severity(SeverityLevel.TRIVIAL)
     @Test
-    //2.13 Вызов из меню About второй ссылки
+    @Description("2.13 Вызов из меню About второй ссылки")
     public void secondAboutLinkTest() throws InterruptedException {
         //ждем, пока на странице появится ссылка "All news" и не нажимаем на нее
         idWaitToBeDisplayedAndThenMaybeClick(R.id.all_news_text_view, false);

@@ -1,6 +1,5 @@
 package ru.iteco.fmhandroid.ui;
 
-import static androidx.core.content.res.TypedArrayUtils.getText;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
@@ -16,17 +15,10 @@ import static androidx.test.espresso.matcher.ViewMatchers.withParent;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertTrue;
 
-//import static ru.iteco.fmhandroid.ui.AppActivityMainMenuTest.popupDecorView;
-
-import android.content.Context;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.Espresso;
 import androidx.test.espresso.PerformException;
 import androidx.test.espresso.UiController;
@@ -43,14 +35,10 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Objects;
-import java.util.Random;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.qameta.allure.kotlin.Step;
 import ru.iteco.fmhandroid.R;
 
 public class Helper {
@@ -120,7 +108,7 @@ public class Helper {
             }
         };
     }
-    //делает релогин из приложения
+    @Step("Делаем релогин из приложения")
     public static void makeRelogin(){
         //жмем на кнопку авторизации
         ViewInteraction appCompatImageButton = onView(allOf(withId(R.id.authorization_image_button), withContentDescription(descriptionOf_authorization_image_button)));
@@ -131,7 +119,7 @@ public class Helper {
         objectOrIdCheckToBeDisplayedAndThenClick(materialTextView, 0);
     }
 
-    //делает попытку авторизации по переданной паре логин/пароль
+    @Step("Делаем попытку авторизации по переданной паре логин/пароль")
     public static void attemptOfAuthorization(String login, String password) {
         try {
             //ждем, пока на странице появится кнопка "SIGN IN"
@@ -162,7 +150,7 @@ public class Helper {
         ViewInteraction materialButton = onView(withId(R.id.enter_button));
         materialButton.perform(click());
     }
-    //попытка нажатия на гиперссылку All news и проверка, что открылась страница со всеми новостями с кнопкой сортировки
+    @Step("Делаем попытку нажатия на гиперссылку All news и проверка, что открылась страница со всеми новостями и кнопкой сортировки")
     public static void attemptOfClickAllNews() {
         //ждем, пока на странице появится ссылка "All news" и нажимаем на нее
         idWaitToBeDisplayedAndThenMaybeClick(R.id.all_news_text_view, true);
@@ -172,8 +160,7 @@ public class Helper {
 
     }
 
-    //Процедура ожидает, пока на странице не появится объект с нужным Id (thisId)
-    //Если объект появился, то если mustBeClicked = true, то кликаем по объекту
+    @Step("Делаем ожидание, пока на странице не появится объект с нужным Id (thisId). Если объект появился, то если mustBeClicked = true, то кликаем по объекту")
     public static void idWaitToBeDisplayedAndThenMaybeClick(int thisId, boolean mustBeClicked) {
         //ждем, пока на странице появится нужный элемент
         onView(isRoot()).perform(waitDisplayed(thisId, waitingPeriod));
@@ -185,7 +172,7 @@ public class Helper {
         }
     }
 
-    //Проверяет, что объект на странице есть и тогда кликает по нему
+    @Step("Проверяем, что объект на странице есть и тогда кликаем по нему")
     public static void objectOrIdCheckToBeDisplayedAndThenClick(ViewInteraction objectView, int ourId) {
         if (objectView == null) {
             objectView = onView(withId(ourId));
@@ -194,7 +181,7 @@ public class Helper {
         objectView.perform(click());
     }
 
-    //Проверяет, что объект на странице есть и тогда вводит в него текст
+    @Step("Проверяем, что объект на странице есть и тогда вводим в него текст")
     public static void objectOrIdCheckToBeDisplayedAndThenReplaceText(ViewInteraction objectView, int ourId, String textForInput) {
         if (objectView == null) {
             objectView = onView(withId(ourId));
@@ -203,15 +190,7 @@ public class Helper {
         objectView.perform(replaceText(textForInput), closeSoftKeyboard());
     }
 
-//    public static void hideKeyboard() {
-//        InputMethodManager imm = (InputMethodManager) ApplicationProvider.getApplicationContext()
-//                .getSystemService(Context.INPUT_METHOD_SERVICE);
-//        if (imm != null && imm.isAcceptingText()) {
-//            imm.hideSoftInputFromWindow(new View(ApplicationProvider.getApplicationContext()).getWindowToken(), 0);
-//        }
-//    }
-
-    //Создает новое событие (новость) с определенным описанием
+    @Step("Создаем новое событие (новость) с определенным описанием")
     public static void attemptCreationNewEvent(NewsData news, boolean firstEvent) {
         if (firstEvent) {
             //убеждаемся, что на странице есть кнопка редактирования события и нажимаем на нее
@@ -241,7 +220,7 @@ public class Helper {
         idWaitToBeDisplayedAndThenMaybeClick(R.id.nav_host_fragment, false);
     }
 
-    //Получает общее количество элементов в объекте RecyclerView
+    @Step("Получаем общее количество элементов в объекте RecyclerView")
     public static int getRecyclerViewItemCount(int recyclerViewId) {
         final int[] itemCount = {0};
 
@@ -265,10 +244,12 @@ public class Helper {
         return itemCount[0];
     }
 
+    @Step("Определяем объект RecyclerViewMatcher")
     public static RecyclerViewMatcher withRecyclerView(final int recyclerViewId) {
         return new RecyclerViewMatcher(recyclerViewId);
     }
 
+    @Step("Перебираем элементы объекта RecyclerView из списка новостей или цитат, пока не найдем нужный по описанию. И тогда выполняем определенное в whatToDo действие")
     public static boolean testIterateAllRecyclerItems(View popupDecorView, int recyclerId, String descriptionForNewsToChoose, String whatToDo) {
         // Создаём AtomicReference для хранения текста
         AtomicReference<String> textReference = new AtomicReference<>();
@@ -379,7 +360,7 @@ public class Helper {
         //если перебрали все элементы, но не нашли нужной новости, то
         return false;
     }
-
+    @Step("Перебираем все элементы объекта RecyclerView из списка новостей и тогда выполняем определенное в whatToDo сравнение")
     public static void testIterateRecyclerItemsByCondition(int recyclerId, String valueForCompair, String whatToDo) {
 
         int itemCount = getRecyclerViewItemCount(recyclerId);
@@ -412,7 +393,7 @@ public class Helper {
             }
         }
     }
-
+    @Step("Перебираем все элементы объекта RecyclerView из списка новостей и записываем в массив номера позиций новостей с переданными описаниями")
     public static int[] testIterateRecyclerItemsBySort(int recyclerId, NewsData news, NewsData news2, NewsData news3) {
         // Создаём AtomicReference для хранения текста
         AtomicReference<String> textReference = new AtomicReference<>();
@@ -467,7 +448,7 @@ public class Helper {
         }
         return numbers;
     }
-    //проверяет, что массив значений упорядочен по возрастанию
+    @Step("Проверяем, что массив значений упорядочен по возрастанию")
     public static boolean isSortedAscending(int[] array) {
         for (int i = 0; i < array.length - 1; i++) {
             if (array[i] > array[i + 1]) {
@@ -476,7 +457,7 @@ public class Helper {
         }
         return true; // если не найдено нарушений — массив отсортирован
     }
-    //проверяет, что массив значений упорядочен по убыванию
+    @Step("Проверяем, что массив значений упорядочен по убыванию")
     public static boolean isSortedDesending(int[] array) {
         for (int i = 0; i < array.length - 1; i++) {
             if (array[i] < array[i + 1]) {

@@ -1,16 +1,14 @@
 package ru.iteco.fmhandroid.ui;
-import android.view.View;
-import android.widget.EditText;
-
-import androidx.test.espresso.UiController;
-import androidx.test.espresso.ViewAction;
-import androidx.test.espresso.matcher.ViewMatchers;
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 
+import android.view.View;
+
+import androidx.test.espresso.ViewAction;
+
 import com.google.android.material.textview.MaterialTextView;
+
+import org.hamcrest.Matcher;
 
 import java.util.concurrent.atomic.AtomicReference;
 

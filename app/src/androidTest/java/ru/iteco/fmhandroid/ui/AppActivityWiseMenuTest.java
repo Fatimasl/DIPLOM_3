@@ -1,13 +1,6 @@
 package ru.iteco.fmhandroid.ui;
 
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.intent.Intents.intended;
-import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
-import static androidx.test.espresso.intent.matcher.IntentMatchers.hasData;
-import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
@@ -21,29 +14,28 @@ import static ru.iteco.fmhandroid.ui.Helper.registeredPassword;
 import static ru.iteco.fmhandroid.ui.Helper.testIterateAllRecyclerItems;
 import static ru.iteco.fmhandroid.ui.Helper.wiseAmount;
 
-import android.content.Intent;
 import android.view.View;
 
-import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.Espresso;
-import androidx.test.espresso.intent.rule.IntentsTestRule;
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
 
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.Random;
 
+import io.qameta.allure.android.runners.AllureAndroidJUnit4;
+import io.qameta.allure.kotlin.Description;
+import io.qameta.allure.kotlin.Severity;
+import io.qameta.allure.kotlin.SeverityLevel;
 import ru.iteco.fmhandroid.R;
-
+@LargeTest
+@RunWith(AllureAndroidJUnit4.class)
 public class AppActivityWiseMenuTest {
 
-//    @Rule
-//    public ActivityScenarioRule<AppActivity> mActivityScenarioRule =
-//            new ActivityScenarioRule<>(AppActivity.class);
     @Rule
     public ActivityTestRule<AppActivity> mActivityRule =
             new ActivityTestRule<>(AppActivity.class);
@@ -51,12 +43,7 @@ public class AppActivityWiseMenuTest {
 
     @Before
     public void setUp() {
-//        mActivityScenarioRule.getScenario().onActivity(new ActivityScenario.ActivityAction<AppActivity>() {
-//            @Override
-//            public void perform(AppActivity activity) {
-//                popupDecorView = activity.getWindow().getDecorView();
-//            }
-//        });
+
         AppActivity activity = mActivityRule.getActivity();
         popupDecorView = activity.getWindow().getDecorView();
     }
@@ -74,20 +61,21 @@ public class AppActivityWiseMenuTest {
         Espresso.onView(withId(R.id.our_mission_title_text_view))
                 .check(matches(withText("Love is all")));
     }
-
+    @Severity(SeverityLevel.TRIVIAL)
     @Test
-    //3.1 Вызов из меню "Бабочка" списка мудростей и проверка их количества
+    @Description("3.1 Вызов из меню Бабочка списка цитат и проверка их количества")
     public void wiseAmountTest()  {
-        //определим сколько элементов с списке мудростей
+        //определим сколько элементов в списке цитат
         int actualItemCount = getRecyclerViewItemCount(R.id.our_mission_item_list_recycler_view);
         //сравним с ожидаемым значением
         assertEquals(wiseAmount, actualItemCount);
     }
 
+    @Severity(SeverityLevel.TRIVIAL)
     @Test
-    //3.2 Вызов из меню "Бабочка" списка мудростей, поиск нужной мудрости по заголовку и проверка соответствия описания мудрости заголовку
+    @Description("3.2 Вызов из меню Бабочка списка цитат, поиск нужной цитаты по заголовку и проверка соответствия описания цитаты заголовку")
     public void wiseContentTest()  {
-        //выберем рандомно число от 1 до 8 и сопоставим ему текст заголовка и части описания мудрости
+        //выберем рандомно число от 1 до 8 и сопоставим ему текст заголовка и части описания цитаты
 
         Random random = new Random();
         int number = random.nextInt(8) + 1; // от 0 до 7 → +1 = от 1 до 8
@@ -129,8 +117,8 @@ public class AppActivityWiseMenuTest {
             default:
         }
 
-        //Проверяем, что мудрость с определенным заголовком существует и ей соответствует определенное описание (поиск по части описания)
-        boolean testResult = testIterateAllRecyclerItems(popupDecorView, R.id.our_mission_item_list_recycler_view, Helper.OurWiseTitle, "Check wise"); //Проверяем наличие новости с определенным текстом
+        //Проверяем, что цитата с определенным заголовком существует и ей соответствует определенное описание (поиск по части описания)
+        boolean testResult = testIterateAllRecyclerItems(popupDecorView, R.id.our_mission_item_list_recycler_view, Helper.OurWiseTitle, "Check wise"); //Проверяем наличие цитаты с определенным текстом
 
         if (testResult) {
             //завершаем тест с успехом
