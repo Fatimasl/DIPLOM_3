@@ -1,10 +1,10 @@
-package ru.iteco.fmhandroid.ui;
+package ru.iteco.fmhandroid.ui.data;
 
 import java.util.Random;
 
 import io.qameta.allure.kotlin.Step;
 
-public class RandomGenerator {
+public class RandomStringGenerator {
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private static final int LENGTH = 8;  // Длина строки
